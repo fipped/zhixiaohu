@@ -4,6 +4,7 @@
     <Scroll 
       :on-reach-bottom="handleReachBottom" 
       :height="windowHeight">
+      
       <Row type="flex" justify="center" class="content">
         <Col :sx="18" :sm="18" :md="16" :lg="14">
           <Row>
@@ -12,6 +13,15 @@
                 <div class="header">
                   <Icon type="ios-list-outline" style="margin-right:10px"></Icon>
                   热点话题动态
+                  <Upload
+                    :headers="{
+                      'X-CSRFTOKEN': this.$cookie.get('csrftoken'),
+                    }"
+                    action="/api/accounts/avatar/"
+                    :before-upload="upload"
+                  >
+        <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
+      </Upload>
                 </div>
                 <div class="watched-list">
                   <Button 
@@ -60,6 +70,7 @@
     data () {
       return {
         windowHeight: '',
+        filename: '',
         heatedTopoics: [
           {label: "电影"},
           {label: "互联网"},
@@ -101,6 +112,10 @@
             resolve();
           }, 2000);
         });
+      },
+      upload(file) {
+        console.log(file)
+        this.filename = file.name
       }
     },
     components: {
