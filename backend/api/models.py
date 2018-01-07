@@ -54,10 +54,11 @@ class Question(models.Model):
                                on_delete=models.CASCADE,
                                related_name="published")
     add_time = models.DateTimeField(u"添加时间", auto_now_add=True)
-    title = models.CharField(u"标题", max_length=100)
+    title = models.CharField(u"标题", max_length=100, unique=True)
     detail = models.TextField(u"描述")
     # watches in accounts
     topics = models.ManyToManyField(to=Topic, related_name='questions')
+    visit_count =models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -138,3 +139,28 @@ class Message(models.Model):
 
     class Meta:
         db_table = 'message'
+        ordering = ('-time',)
+
+
+# class Activity(models.Model):
+#     type = models.CharField(max_length=50)
+#     user = models.ForeignKey(to=Profile,
+#                              on_delete=models.CASCADE,
+#                              related_name='activities'
+#                              )
+#
+#     answer = models.ForeignKey(to=Answer,
+#                                on_delete=models.CASCADE,
+#                                null=True)
+#     question = models.ForeignKey(to=Question,
+#                                  on_delete=models.CASCADE,
+#                                  null=True)
+#     watch = models.ForeignKey(to=Profile,
+#                              on_delete=models.CASCADE,
+#                              related_name='activities',
+#                              null=True)
+#     time = models.DateField(auto_now_add=True)
+#
+#     class Meta:
+#         db_table = 'activity'
+#         ordering = ('-time',)
