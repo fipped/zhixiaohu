@@ -44,6 +44,7 @@
               <div>
                 <el-tabs 
                   :value="profilePaneActiveName" 
+                  @tab-click="tabClick"
                   class="profile-pane">
                   <el-tab-pane label="动态" name="timeline">
                     <div class="profile-pane-header">{{$route.params.id == $store.state.userid ? '我' : 'Ta'}}的动态</div>
@@ -196,7 +197,7 @@
             <Col span="8" class="profile-body-right">
               <div>
                 <div class="watch-bar">
-                  <div class="watch-people" @click="morePaneActiveName = 'watch';profilePaneActiveName = 'more';">
+                  <div class="watch-people" @click="profilePaneActiveName = 'more';morePaneActiveName = 'watch';">
                     <div>关注了</div>
                     <div>{{watchedUser.length}}</div>
                   </div>
@@ -306,26 +307,25 @@
           }, 2000);
         });
       },
-      changePane(name) {
-        console.log(111)
-        this.profilePaneActiveName = name;
+      tabClick(pane) {
+        this.profilePaneActiveName = pane.name;
       }
     },
     created () {
       if(this.initInfo()){
-        this.$http.get(`/api/accounts/profile/${this.$route.params.id}/`)
+        this.$http.get(`/api/profiles/${this.$route.params.id}/`)
         .then(res => {
           if(res.body.success) {
             let data = res.body.data
             this.nickName = data.nickname
             this.description = data.description.length == 0 ? "这个用户很懒，什么也没留下" : data.description
-            this.watchedUser = data.watchedUser
+            this.watchedUser = data.watchedUser || []
             this.watchedBy = data.watchedBy || []
-            this.watchedQuestion = data.watchedQuestion
+            this.watchedQuestion = data.watchedQuestion || []
             this.askQuestion = data.askQuestion || []
-            this.history = data.history
-            this.favorites = data.favorites
-            this.avatarUrl = data.avatar
+            this.history = data.history || []
+            this.favorites = data.favorites || []
+            this.avatarUrl = data.avatar || ''
           }
         })
       }
