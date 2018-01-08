@@ -1,12 +1,11 @@
-from rest_framework import mixins
 from rest_framework.decorators import detail_route
 from rest_framework.filters import SearchFilter
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 from api.models import Question, Activity
 from api.serializers import QuestionCreateSerializer, QuestionDetailSerializer, AnswerSerializer
+from utils import mixins
 from utils.views import GenericViewSet, error, success
 
 
@@ -51,13 +50,12 @@ class QuestionViewSet(GenericViewSet,
     @detail_route(methods=['GET'])
     def get_answers(self, request, pk):
         question = self.get_object()
+        if question is None:
+            return error("no topic found")
         if request.user.is_authenticated:
             profile = request.user.profile
             profile.history.add(question)
             profile.save()
-        if question is None:
-            return error("no topic found")
-
         queryset = self.filter_queryset(question.answers.all())
 
         page = self.paginate_queryset(queryset)

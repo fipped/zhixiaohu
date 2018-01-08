@@ -47,6 +47,7 @@ class Topic(models.Model):
 
     class Meta:
         db_table = 'topic'
+        ordering = ('-heat', )
 
 
 class Question(models.Model):
@@ -65,6 +66,7 @@ class Question(models.Model):
 
     class Meta:
         db_table = 'question'
+        ordering = ('-visit_count', )
 
 
 class Answer(models.Model):
@@ -104,6 +106,7 @@ class Comment(models.Model):
 
     class Meta:
         db_table = 'comment'
+        ordering = ('-add_time',)
 
 
 class Profile(models.Model):
