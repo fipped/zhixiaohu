@@ -32,18 +32,18 @@ class ProfileViewSet(GenericViewSet,
         profile = self.get_object()
         if profile:
             if request.user.is_authenticated:
-                count = request.user.profile\
+                count = request.user.profile \
                     .watchedUser.filter(profile=profile)
                 profile.is_watch = count
             else:
                 profile.is_watch = False
-            seri = self.get_serializer(profile, context={'request':request})
+            seri = self.get_serializer(profile, context={'request': request})
             return success(seri.data)
         return error("no profile found")
 
     # update nickname or description
     @list_route(methods=['POST'],
-                permission_classes=(IsAuthenticated, ))
+                permission_classes=(IsAuthenticated,))
     def update_info(self, request, *args, **kwargs):
         profile = request.user.profile
         if profile is None:
@@ -79,6 +79,13 @@ class ProfileViewSet(GenericViewSet,
             for answer in page:
                 profile = answer.author.profile
                 answer.userSummary = profile
+                user = request.user
+                if user.is_authenticated:
+                    answer.has_approve = user.profile.agreed.filter(id=answer.id).exists()
+                    answer.has_against = user.profile.disagreed.filter(id=answer.id).exists()
+                else:
+                    answer.has_approve = False
+                    answer.has_against = False
             serializer = AnswerSerializer(page, many=True)
             temp = self.get_paginated_response(serializer.data)
             return success(temp.data)
@@ -111,6 +118,13 @@ class ProfileViewSet(GenericViewSet,
             for answer in page:
                 profile = answer.author.profile
                 answer.userSummary = profile
+                user = request.user
+                if user.is_authenticated:
+                    answer.has_approve = user.profile.agreed.filter(id=answer.id).exists()
+                    answer.has_against = user.profile.disagreed.filter(id=answer.id).exists()
+                else:
+                    answer.has_approve = False
+                    answer.has_against = False
             serializer = AnswerSerializer(page, many=True)
             temp = self.get_paginated_response(serializer.data)
             return success(temp.data)
@@ -132,7 +146,6 @@ class ProfileViewSet(GenericViewSet,
             return success(temp.data)
         return error('no more data')
 
-
     @detail_route(methods=['GET'])
     def activities(self, request, pk=None):
         profile = self.get_object()
@@ -144,7 +157,7 @@ class ProfileViewSet(GenericViewSet,
 
             for activity in page:
                 if activity.watch:
-                    activity.watch.is_watch=True
+                    activity.watch.is_watch = True
                 elif activity.question:
                     activity.question.answer_count = \
                         activity.question.answers.count()
@@ -153,12 +166,19 @@ class ProfileViewSet(GenericViewSet,
                 elif activity.answer:
                     profile = activity.answer.author.profile
                     activity.answer.userSummary = profile
+                    instance = activity.answer
+                    user = request.user
+                    if user.is_authenticated:
+                        instance.has_approve = user.profile.agreed.filter(id=instance.id).exists()
+                        instance.has_against = user.profile.disagreed.filter(id=instance.id).exists()
+                    else:
+                        instance.has_approve = False
+                        instance.has_against = False
 
             serializer = self.get_serializer(page, many=True)
             temp = self.get_paginated_response(serializer.data)
             return success(temp.data)
         return error('no more data')
-
 
     @detail_route(methods=['GET'])
     def watched_questions(self, request, pk=None):
@@ -204,7 +224,7 @@ class ProfileViewSet(GenericViewSet,
         page = self.paginate_queryset(profiles)
         if page is not None:
             for profile in page:
-                profile.is_watch = request.user.profile\
+                profile.is_watch = request.user.profile \
                     .watchedUser.filter(profile=profile).exists()
             serializer = ProfileSerializer(page, many=True,
                                            context={'request': request})
