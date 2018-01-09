@@ -83,10 +83,13 @@ class ProfileViewSet(GenericViewSet,
                 if user.is_authenticated:
                     answer.has_approve = user.profile.agreed.filter(id=answer.id).exists()
                     answer.has_against = user.profile.disagreed.filter(id=answer.id).exists()
+                    answer.has_favorite = user.profile.favorites.filter(id=answer.id).exists()
                 else:
                     answer.has_approve = False
                     answer.has_against = False
-            serializer = AnswerSerializer(page, many=True)
+                    answer.has_favorite = False
+                answer.comment_count = answer.comments.count()
+            serializer = AnswerSerializer(page, many=True, context={'request': request})
             temp = self.get_paginated_response(serializer.data)
             return success(temp.data)
         return error('no more data')
@@ -123,10 +126,12 @@ class ProfileViewSet(GenericViewSet,
                 if user.is_authenticated:
                     answer.has_approve = user.profile.agreed.filter(id=answer.id).exists()
                     answer.has_against = user.profile.disagreed.filter(id=answer.id).exists()
+                    answer.has_favorite = user.profile.favorites.filter(id=answer.id).exists()
                 else:
                     answer.has_approve = False
                     answer.has_against = False
-            serializer = AnswerSerializer(page, many=True)
+                    answer.has_favorite = False
+            serializer = AnswerSerializer(page, many=True, context={'request': request})
             temp = self.get_paginated_response(serializer.data)
             return success(temp.data)
         return error('no more data')
@@ -175,13 +180,16 @@ class ProfileViewSet(GenericViewSet,
                     profile = activity.answer.author.profile
                     activity.answer.userSummary = profile
                     instance = activity.answer
+                    instance.comment_count = instance.comments.count()
                     user = request.user
                     if user.is_authenticated:
                         instance.has_approve = user.profile.agreed.filter(id=instance.id).exists()
                         instance.has_against = user.profile.disagreed.filter(id=instance.id).exists()
+                        instance.has_favorite = user.profile.favorites.filter(id=instance.id).exists()
                     else:
                         instance.has_approve = False
                         instance.has_against = False
+                        instance.has_favorite = False
 
             serializer = self.get_serializer(page, many=True)
             temp = self.get_paginated_response(serializer.data)

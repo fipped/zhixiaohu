@@ -74,7 +74,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ProfileSummarySerializer(serializers.ModelSerializer):
+class ProfileSummarySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'avatar', 'nickname', 'description')
@@ -120,10 +120,11 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     has_approve = serializers.BooleanField()
     has_against = serializers.BooleanField()
+    has_favorite = serializers.BooleanField()
     class Meta:
         model = Answer
         fields = ('id', 'userSummary', 'approve', 'question', 'has_approve',
-                  'has_against', 'add_time', 'detail', 'comment_count')
+                  'has_against', 'has_favorite', 'add_time', 'detail', 'comment_count')
 
 
 class AnswerCreateSerializer(serializers.ModelSerializer):
