@@ -93,12 +93,7 @@
                             赞同了回答
                           </div>
                           <AnswerListCard
-                            :pk="item.answer.userSummary.id"
-                            :authorBadge="item.answer.userSummary.description"
-                            :authorAvatar="item.answer.userSummary.avatar"
-                            :question="item.answer.question.title" 
-                            :answer="item.answer.detail"
-                            :authorName="item.answer.userSummary.nickname"
+                            :answer="item"
                           >
                           </AnswerListCard>
                         </template>
@@ -116,13 +111,8 @@
                       </div>
                       <AnswerListCard
                         v-for="(item, index) in answerList"
-                        :pk="item.userSummary.id"
                         :key="index"
-                        :authorBadge="item.userSummary.description"
-                        :authorAvatar="item.userSummary.avatar"
-                        :question="item.question.title" 
-                        :answer="item.detail"
-                        :authorName="item.userSummary.nickname"
+                        :answer="item"
                       >
                       </AnswerListCard>
                     </div>
@@ -215,13 +205,8 @@
                         </div>
                         <AnswerListCard
                           v-for="(item, index) in answerList"
-                          :pk="item.userSummary.id"
                           :key="index"
-                          :authorBadge="item.userSummary.description"
-                          :authorAvatar="item.userSummary.avatar"
-                          :question="item.question.title" 
-                          :answer="item.detail"
-                          :authorName="item.userSummary.nickname"
+                          :answer="item"
                         >
                         </AnswerListCard>
                       </el-tab-pane>
@@ -310,7 +295,9 @@ const TopBar = resolve => require(["@/components/topBar"], resolve);
     },
     watch: {
       '$route' (to, from) {
-        if(from.name === 'profile' && from.path !== to.path)
+        if(from.name === 'profile' && from.path !== to.path) {
+          this.morePaneActiveName = 'watch'
+          this.profilePaneActiveName = 'activities'
           if(this.initInfo()){
             this.getProfile()
           }
@@ -319,6 +306,7 @@ const TopBar = resolve => require(["@/components/topBar"], resolve);
           this.getWatchQuestions()
           this.getCollectAnswer()
           this.getHistory()
+        }
       }
     },
     data() {
