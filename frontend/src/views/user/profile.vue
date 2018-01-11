@@ -20,13 +20,17 @@
                   <div style="font-size:2em;font-weight:bold;">{{nickName}}</div>
                   <div style="font-size:1.3em;">{{description}}</div>
                 </Col>
-                <Col span="3" offset="8" class="parent-height">
+                <Col 
+                  :xs="{ span: 5, offset: 6 }" 
+                  :sm="{ span: 4, offset: 7 }" 
+                  :md="{ span: 4, offset: 7 }" 
+                  :lg="{ span: 3, offset: 8 }" class="parent-height">
                   <Button 
                     v-if="$route.params.id == $store.state.userid"
                     type="ghost" 
                     size="large"
                     style="bottom: 5px;position: absolute;"
-                    @click="$router.push({name: 'profileEdit'})"
+                    @click="$router.push({path: '~/edit'})"
                   >编辑个人资料</Button>
                   <Button 
                     v-else
@@ -521,7 +525,7 @@ export default {
     },
     getAnswers() {
       //获取用户回答
-      api.getHerAnswer(this.$route.params.id).then(
+      api.getHerAnswers(this.$route.params.id).then(
         res => {
           if (res.body.success) {
             this.answerList = res.body.data.results;
@@ -585,7 +589,7 @@ export default {
     },
     getHistory() {
       //获取用户黑历史
-      api.getHistory().then(
+      api.getHistory(this.$route.params.id).then(
         res => {
           if (res.body.success) {
             this.history = res.body.data.results;
@@ -611,7 +615,7 @@ export default {
               data.description.length == 0 ? "这个用户很懒，什么也没留下" : data.description;
             this.watchbyUserCount = data.beWatchCount;
             this.watchedUserCount = data.watchCount;
-            this.avatarUrl = data.avatar || require("@/assets/avatar.jpg");
+            this.avatarUrl = data.avatar;
           } else {
             this.$Message.error(res.body.msg);
           }
@@ -646,6 +650,7 @@ export default {
 }
 .profile {
   height: 100vh;
+  min-width: 1000px;
   .parent-height {
     height: 100%;
   }
