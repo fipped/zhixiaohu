@@ -1,12 +1,19 @@
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from api.models import Topic, Question
+from api.models import Topic
 from api.serializers import TopicListSerializer, QuestionListSerializer, AnswerSerializer
 
-from utils.views import error, success, GenericViewSet
-from utils import mixins
+from api.utils.views import error, success, GenericViewSet
+from api.utils import mixins
+
+
+class TopicSetPagination(PageNumberPagination):
+    page_size = 16
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
 
 
 # create topic | list topic(search) | list question assocated with topic
@@ -14,10 +21,10 @@ class TopicViewSet(GenericViewSet,
                    mixins.RetrieveModelMixin,
                    mixins.ListModelMixin,
                    mixins.CreateModelMixin):
-
-    filter_backends = (SearchFilter, )
-    search_fields =('label', 'introduction')
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    filter_backends = (SearchFilter,)
+    search_fields = ('label', 'introduction')
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = TopicSetPagination
 
     def get_queryset(self, pk=None):
         return Topic.objects.all()
@@ -28,6 +35,15 @@ class TopicViewSet(GenericViewSet,
         if self.action == 'get_answers':
             return AnswerSerializer
         return TopicListSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return success(serializer.data)
+        key = list(serializer.errors.keys())[0]
+        return error(key + ': ' + serializer.errors[key][0])
 
     @detail_route(methods=['GET'])
     def get_questions(self, request, pk=None):
@@ -83,9 +99,3 @@ class TopicViewSet(GenericViewSet,
             temp = self.get_paginated_response(serializer.data)
             return success(temp.data)
         return error('no more data')
-
-
-
-
-
-
