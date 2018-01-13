@@ -96,10 +96,10 @@
                           <div class="activities-header">
                             赞同了回答
                           </div>
-                          <AnswerListCard
+                          <AnswerCard
                             :answer="item.answer"
                           >
-                          </AnswerListCard>
+                          </AnswerCard>
                         </template>
                       </div>
                     </div>
@@ -113,12 +113,12 @@
                       >
                         还没有回答
                       </div>
-                      <AnswerListCard
+                      <AnswerCard
                         v-for="(item, index) in answerList"
                         :key="index"
                         :answer="item"
                       >
-                      </AnswerListCard>
+                      </AnswerCard>
                     </div>
                   </el-tab-pane>
                   <el-tab-pane label="提问" name="question">
@@ -152,7 +152,7 @@
                           class="no-data-content" 
                           v-if="watchedUser.length == 0"
                         >
-                          还没有关注用户
+                          空空如也~
                         </div>
                         <user-card
                           v-for="(user, index) in watchedUser"
@@ -173,7 +173,7 @@
                           class="no-data-content" 
                           v-if="watchedBy.length == 0"
                         >
-                          还没有关注用户
+                          空空如也~
                         </div>
                         <user-card
                           v-for="(user, index) in watchedBy"
@@ -214,12 +214,12 @@
                         >
                           还没有收藏的回答
                         </div>
-                        <AnswerListCard
+                        <AnswerCard
                           v-for="(item, index) in favorites"
                           :key="index"
                           :answer="item"
                         >
-                        </AnswerListCard>
+                        </AnswerCard>
                       </el-tab-pane>
                       <el-tab-pane class="more-tab-pane" label="围观历史" name="history">
                         <div 
@@ -289,8 +289,8 @@
 </template>
 
 <script>
-const AnswerListCard = resolve =>
-  require(["@/components/answerListCard"], resolve);
+const AnswerCard = resolve =>
+  require(["@/components/answerCard"], resolve);
 const userCard = resolve => require(["@/components/userCard"], resolve);
 const questionCard = resolve => require(["@/components/questionCard"], resolve);
 import cookieManage from "@/mixins/cookieManage";
@@ -301,7 +301,7 @@ export default {
   name: "profile",
   mixins: [cookieManage, initInfo],
   components: {
-    AnswerListCard,
+    AnswerCard,
     userCard,
     questionCard
   },
@@ -609,6 +609,7 @@ export default {
         res => {
           if (res.body.success) {
             let data = res.body.data;
+            console.log(data);
             this.nickName = data.nickname;
             this.isWatched = data.is_watch;
             this.description =
@@ -624,26 +625,34 @@ export default {
           this.$Message.error(err.status + " " + err.statusText);
         }
       );
+    },
+    init() {
+      if (this.initInfo()) {
+        this.getProfile();
+      }
+      this.getActivities();
+      this.getWatchUser();
+      this.getWatchQuestions();
+      this.getCollectAnswer();
+      this.getHistory();
+      if (this.$route.hash) {
+        this.morePaneActiveName = "collectedAnswer";
+        this.profilePaneActiveName = "more";
+      }
     }
   },
   created() {
-    if (this.initInfo()) {
-      this.getProfile();
-    }
-    this.getActivities();
-    this.getWatchUser();
-    this.getWatchQuestions();
-    this.getCollectAnswer();
-    this.getHistory();
-    if(this.$route.hash) {
-      this.morePaneActiveName = 'collectedAnswer'
-      this.profilePaneActiveName = 'more'
-    }
+    this.init();
   },
   mounted() {
     this.$nextTick(() => {
       this.windowHeight = document.body.clientHeight;
     });
+  },
+  watch: {
+    $route(from, to) {
+      this.init();
+    }
   }
 };
 </script>
@@ -653,7 +662,7 @@ export default {
   overflow: hidden !important;
 }
 .profile {
-  height: 100vh;
+  height: auto;
   min-width: 1000px;
   .parent-height {
     height: 100%;
@@ -699,6 +708,8 @@ export default {
           .profile-pane-body {
             min-height: 300px;
             .activities-content {
+              margin: 15px 0;
+              border:1px solid #dddee1;
               .activities-header {
                 color: #8590a6;
                 margin: 10px 0 -5px 10px;
