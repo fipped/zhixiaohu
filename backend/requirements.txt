@@ -20,7 +20,7 @@ Pillow==4.3.0
 pyasn1==0.4.2
 Pygments==2.2.0
 pytz==2017.3
-PyYAML==3.12
+PyYAML==5.4
 qiniu==7.2.0
 RandomWords==0.2.1
 redis==2.10.6
