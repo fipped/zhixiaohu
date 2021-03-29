@@ -18,7 +18,7 @@ Naked==0.1.31
 olefile==0.44
 Pillow==4.3.0
 pyasn1==0.4.2
-Pygments==2.2.0
+Pygments==2.7.4
 pytz==2017.3
 PyYAML==3.12
 qiniu==7.2.0
